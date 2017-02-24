@@ -11,13 +11,13 @@ This code provides fixes and enchancements for the Adafruit USB Serial RGB LCD B
 
 This code is a complete rewrite of the Adafruit RGB Backpack code. This code adds GPIO, specifically input capability to the Backpack functionality. This allows the LCD to function as a simple remote terminal with up to 4 "key/button" inputs and/or "LED indicators" able to communicate over a simple 2 wire serial interface. The code also incorporates a number of other enhancements detailed below.
 
-See *BACKPACK_PLUS_README.md* for details.
+See *[BACKPACK_PLUS_README.md](https://github.com/CanyonCasa/BackpackPlus/blob/master/BackpackPlus/BACKPACK_PLUS_README.md)* for details.
 
 ### Adafruit_USBSerialLCDwithIO
 
 This code adds GPIO, specifically input capability to the existing Adafruit code. These changes allow the LCD to function as a simple remote terminal with up to 4 "key/button" inputs and communicate over a simple 2 wire serial interface. It also makes a few fixes noted below.
 
-See *WITH_IO_README.md* for details.
+See *[WITH_IO_README.md](https://github.com/CanyonCasa/BackpackPlus/blob/master/Adafruit_USBSerialLCDwithIO/WITH_IO_README.md])* for details.
 
 
 ### Adafruit_USBSerialLCD
