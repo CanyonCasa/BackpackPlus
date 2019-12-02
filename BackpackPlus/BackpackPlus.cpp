@@ -28,7 +28,7 @@ All text above must be included in any redistribution
 #include <stdarg.h>
 
 // code parameters...
-#define VERSION "+17B1"                 // '+'+YEAR+ALPHA_MONTH+VERSION 
+#define VERSION "+19L1"                 // '+'+YEAR+ALPHA_MONTH+VERSION 
 #define RELATIVE true
 #define ABSOLUTE false
 #define SCROLLBEFORE 0
@@ -37,6 +37,7 @@ All text above must be included in any redistribution
 #define SCROLLMODE 2
 #define EEPROM_PAGE_SIZE 4              // EEPROM page size used by EXTENDED_DUMP_EEPROM and EXTENDED_EDIT_EEPROM commands
 #define EEPROM_SIZE 512                 // EEPROM size
+#define EEPROM_PAGE_MASK ((EEPROM_SIZE/EEPROM_PAGE_SIZE)-1)  // EEPROM page range mask
 #define MAXCOLS 20                      // MAXIMUM DISPLAY SIZE, NOTE: AT90USB162 could handle 40x4 displays
 #define MAXROWS 4
 #define DEFAULTCOLS 16                  // DEFAULT DISPLAY SIZE
@@ -56,6 +57,7 @@ All text above must be included in any redistribution
 #define ECHOCHARS 1                     // echo received characters
 #define DUMPENABLE 4                    // enable debug dump of virtual display data
 #define DUMPVD 64                       // Dump virtual display data immediately
+#define DUMPIO 128                      // Inhibit automatic I/O changes dumps
 
 // I/O pin declarations...
 // LCD I/O pins
@@ -280,12 +282,14 @@ void loop() {
     }
   }; 
   // when not waiting on serial, poll for input port changes... 
-  // ~laxy interrupt and debounce.
+  // ~laxy interrupt and debounce. Disable using DEBUG.
   tmp = gpioRead();
   if (tmp!=gpioPort) {
     gpioPort = tmp;
-    gpioSend(gpioPort);
-    delayMS(10);
+    if (!(cmdFlags&DUMPIO)) {
+      gpioSend(gpioPort);
+      delayMS(10);
+    };
   }
   // check display timeout
   if (onTime) { // only execute if timed display
@@ -454,17 +458,18 @@ void parseCommand() {
       display(1);
       break;
     case EXTENDED_DEBUG:
-      cmdFlags = serialBlockingRead();     // define command debug flags
+      cmdFlags = serialBlockingRead();  // define command debug flags
       if (cmdFlags&DUMPVD)              // test for immediate virtual display dump
         dumpVirtualDisplay(1);
       break;
     case EXTENDED_DUMP_EEPROM:
-      a = serialBlockingRead(); // first page
-      b = serialBlockingRead(); // last page
+      a = serialBlockingRead() & EEPROM_PAGE_MASK; // first page
+      b = serialBlockingRead() & EEPROM_PAGE_MASK; // last page
+      DEBUGTERM.spf(F("EEPROM Dump pages: 0x%02X ... 0x%02X\n"),a,b);
       dumpEEPROM(a,b);
       break;
     case EXTENDED_EDIT_EEPROM:
-      a = serialBlockingRead(); // page
+      a = serialBlockingRead() & EEPROM_PAGE_MASK; // page
       DEBUGTERM.spf(F("EEPROM Edit..."));
       dumpEEPROM(a,a);
       for (uint8_t j=0;j<EEPROM_PAGE_SIZE;j++)

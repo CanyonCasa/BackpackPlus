@@ -2,7 +2,7 @@
 
 VPATH = ./tmp:./teensyplus:./libraries:../BackpackPlus
 TEMP = ./tmp
-PORT = COM5
+PORT = COM4
 AVRDUDE_MODE = AVR109
 DEVICE = usb162
 FLASH_HEX = flash.hex
@@ -119,14 +119,16 @@ list:
 
 # remove tmp files...
 clean:
-	rm ./$(TEMP)/*
+	rm $(TEMP)/*
 
 # upload hex to Backpack...
 burn:
 	avrdude -P $(PORT) -c $(AVRDUDE_MODE) -p $(DEVICE) -U flash:w:$(TEMP)/$(CODE_HEX)
+
 # download Backpack code to flash.hex
 flash:
 	avrdude -P $(PORT) -c $(AVRDUDE_MODE) -p $(DEVICE) -U flash:r:$(TEMP)/$(FLASH_HEX):h
+
 # download Backpack EEPROM data to ee.hex
 ee:
 	avrdude -P $(PORT) -c $(AVRDUDE_MODE) -p $(DEVICE) -U eeprom:r:$(TEMP)/$(EE_HEX):h

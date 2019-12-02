@@ -5,19 +5,19 @@ Adafruit USB Serial RGB LCD Backpack
 
 ## Summary
 
-This code provides fixes and enchancements for the Adafruit USB Serial RGB LCD Backpack.
+This code provides fixes and adds enchancements for the Adafruit USB Serial RGB LCD Backpack.
 
 ### BackpackPlus
 
 This code is a complete rewrite of the Adafruit RGB Backpack code. This code adds GPIO, specifically input capability to the Backpack functionality. This allows the LCD to function as a simple remote terminal with up to 4 "key/button" inputs and/or "LED indicators" able to communicate over a simple 2 wire serial interface. The code also incorporates a number of other enhancements detailed below.
 
-See *[BACKPACK_PLUS_README.md](https://github.com/CanyonCasa/BackpackPlus/blob/master/BackpackPlus/BACKPACK_PLUS_README.md)* for details.
+See *BACKPACK_PLUS_README.md* for details.
 
 ### Adafruit_USBSerialLCDwithIO
 
 This code adds GPIO, specifically input capability to the existing Adafruit code. These changes allow the LCD to function as a simple remote terminal with up to 4 "key/button" inputs and communicate over a simple 2 wire serial interface. It also makes a few fixes noted below.
 
-See *[WITH_IO_README.md](https://github.com/CanyonCasa/BackpackPlus/blob/master/Adafruit_USBSerialLCDwithIO/WITH_IO_README.md])* for details.
+See *WITH_IO_README.md* for details.
 
 
 ### Adafruit_USBSerialLCD
@@ -32,13 +32,13 @@ Code to erase the contents of EEPROM. Useful for reinitializing the EEPROM befor
 
 ### Adafruit Upgrade Requests
 
-The BackpackPlus code utilizes all of the available capacity of the AT90USB162 processor, literally only having a few bytes of free code space. (Actually, the Teensy 1.0 core reports the bootloader starts at 0x3E00, 15,872 bytes) but the interface will not load files larger than 0x3000, 12,228 bytes, in size.) It would nice to have an upgraded Backpack. A number of other features could be added with more memory.
+The BackpackPlus code utilizes all of the available capacity of the AT90USB162 processor, literally only having a few bytes of free code space. (Actually, the Teensy 1.0 core reports the bootloader starts at 0x3E00, 15,872 bytes) but the interface will not load files larger than 0x3000, 12,228 bytes, in size.) It would nice to have an upgraded Backpack processor. A number of other features could be added with more memory.
 
-Should Adafruit decide to upgrade the Backpack, it would be nice to include:
+Should Adafruit decide to upgrade the Backpack processor, it would be nice to include:
 
-* **ATMEGA32U4 or other non-obsolete processor**: This would provide more memory for code, RAM, and EEPROM, with only minor *#define* changes the Backpack could easily support 40x4 or 20x6 displays, although Adafruit does not presently offer any such dsiplays. (The Adafruit schematics actually call out the ATMEGA32U4 part but the Backpack uses the AT90USB162, so I assume they are pin compatible.)
+* **ATMEGA32U4 or other non-obsolete processor**: This would provide more memory for code, RAM, and EEPROM, with only minor *#define* changes the Backpack could easily support 40x4 or 20x6 displays, although Adafruit does not presently offer any such displays. (The Adafruit schematics actually call out the ATMEGA32U4 part but the Backpack uses the AT90USB162, so I assume they are pin compatible.)
 
-* **More I/O**: its there just not used.
+* **More I/O**: it's there just not used.
 
 * **4-pin JST connector**: To support both RX and TX. 5-pins with a spare line for hacking would be better.
 
@@ -54,13 +54,17 @@ Code has been tested with an Adafruit 16x2 RGB Negative LCD. I currently do not 
 
 ### TeensyPlus Core
 
-This folder provides a modified copy of the Teensy 1.0 core for archival since the vendor no longer supports this version. The Print.h Print.cpp files have been modified for this version to include the simple print formatted (i.e. spf) function used by BackpackPlus code.
+The build/teensyplus folder provides a modified copy of the Teensy 1.0 core for archival since the vendor no longer supports this version. The **Print.h** and **Print.cpp** files have been modified for this version to include the _**simple print formatted**_ (i.e. spf) function used by BackpackPlus code.
 
 ### Compiling
 
 Initially, I setup a virtual machine running Arduino 1.05 on Windows 7 in order to get the existing code compiled. Note: the code requires at least Arduino 1.0, and PRJC discontinued Teensy 1.0 support with Arduino 1.06. Using the Arduino IDE process converts a "\*.ino" file into a temp "\*.cpp" file that can be directly compiled with the AVR compiler.
 
-I copied the temp file to the code directory, along with a copy of the Arduino libraries and modified Teensy 1.0 core into the build directory. Then I created a "brute force" *makefile* to compile and link the code directly with the avr-gcc/avr-g++ version 4.3.3 compilers. The *makefile* could certainly be greatly simplified and improved, but suffices for this single build operation. Output can be found in the tmp folder under the build folder. 
+I copied the temp file to the code directory, along with a copy of the Arduino libraries and modified Teensy 1.0 core into the build directory. Then I created a "brute force" *makefile* to compile and link the code directly with the avr-gcc/avr-g++ version 4.3.3 compilers. The *makefile* could certainly be greatly simplified and improved, but suffices for this single build operation. Output can be found in the tmp folder under the build folder.
+
+#### AVR Compiler
+
+I installed [WinAVR](https://sourceforge.net/projects/winavr/) , which represents a very old version 4.3.3 but still runs under Windows 10 as of this writing. Installing WinAVR automatically installs AVRDUDE for uploading code to the Backpack as well.
 
 #### *make* Commands
 
@@ -70,14 +74,11 @@ I copied the temp file to the code directory, along with a copy of the Arduino l
 
 **make list**: Lists the temp directory
 
-**make burn**: Uploads the code to the Backpack using AVRDUDE. Reset the Backpack to enter bootloader mode (red LED flashes). Then run *make build* command.
+**make burn**: Uploads the code to the Backpack using AVRDUDE. Reset the Backpack (i.e. ground Reset pin on backside) to enter bootloader mode (red LED flashes). Then run *make burn* command.
 
-**make flash**: Download the code from the Backpack using AVRDUDE.Reset the Backpack to enter bootloader mode (red LED flashes). Then run *make flash* command. Code placed in temp folder as flash.hex
+**make flash**: Download the code from the Backpack using AVRDUDE. Reset the Backpack to enter bootloader mode (red LED flashes). Then run *make flash* command. Code placed in temp folder as flash.hex
 
 **make eeprom**: Download the EEPROM data from the Backpack using AVRDUDE. then dumps to console using hex2Txt.py script. Reset the Backpack to enter bootloader mode (red LED flashes). Then run *make eeprom* command. EEPROM hex file placed in temp folder as ee.hex
-
-
-**TBD**
 
 ### Download Code and EEPROM/Uploading Code
 

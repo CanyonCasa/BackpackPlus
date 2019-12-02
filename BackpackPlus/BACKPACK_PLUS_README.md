@@ -116,7 +116,7 @@ Set backlight contrast, not saved to EEPROM. Use SaveContrast to also write EEPR
 
 Sets the read mask and performs a read of the port state, adjusted with mask. Returns same hex string format as polling reports.
 
-Low nibble of **mask** ANDs with the 4 GPIO pins (GPIO[4:1]) and the high nibble XORs with the AND result, effectively inverting the specified bits. Therefore, the mask sets which bits (GPIO[4:1]) are watched for change and which bitsd have inverted sense. For example a 0xFF mask watches all bits with inverted sense. A mask of 0x01 watches only the LSB without inverted sense. Read mask default is 0xFF. See *Port Behavior Change* section for more info.
+Low nibble of **mask** ANDs with the 4 GPIO pins (GPIO[4:1]) and the high nibble XORs with the AND result, effectively inverting the specified bits. Therefore, the mask sets which bits (GPIO[4:1]) are watched for change and which bits have inverted sense. For example a 0xFF mask watches all bits with inverted sense. A mask of 0x01 watches only the LSB without inverted sense. Read mask default is 0xFF. See *Port Behavior Change* section for more info.
 
 ### GPIORead (0xFE 0x59)
 
@@ -177,15 +177,15 @@ FLAG | Description
 4 |
 5 |
 6 | Dump virtual display data immediately
-7 | 
+7 | Disable automatically sending I/O changes. I/O states still accessible with GPIORead.
 
 ### DumpEEPROM (0xFE 0xDD &lt;start_page&gt; &lt;end_page&gt;)
 
-Dumps/reads (4 byte) pages of EEPROM to serial output streams. Each page written as newline terminated hex text. See code for memory map. 
+Dumps/reads (4 byte) pages of EEPROM to serial output streams. Each page written as newline terminated hex text. See code for memory map. Note: This command takes start and end pages, not addresses. The code truncates the pages to stay within bounds of the available EEPROM.
 
 ### EditEEPROM (0xFE 0xDE &lt;page&gt; &lt;byte1&gt; &lt;byte2&gt; &lt;byte3&gt; &lt;byte4&gt;)
 
-Edit/writes/save a (4 byte) page of EEPROM. Useful for small paramter changes. Can be used to write unique user data to unused EEPROM areas, which can be read with the DumpEEPROM command. See code for memory map. 
+Edit/writes/save a (4 byte) page of EEPROM. Useful for small paramter changes. Can be used to write unique user data to unused EEPROM areas, which can be read with the DumpEEPROM command. See code for memory map. Note: This command takes an EEPROM page, not address. The code truncates the pages to stay within bounds of the available EEPROM, which result in an incorrect location.
 
 ### Test (0xFE 0xDF &lt;option&gt;)
 
@@ -196,7 +196,7 @@ Reserved for new code testing.
 STATUS | SCRIPT NAME | CODE | DESCRIPTION
 --- | --- | --- | ---
 ALL | SetBaud | 0x39 | Set serial baud rate and writes to EEPROM.
-AF | ChangeSplash | 0x40 | Writes splash screen text to EEPROM.
+AF  | ChangeSplash | 0x40 | Writes splash screen text to EEPROM.
 NEW | SaveSplash | 0x40 | Save the display screen to EEPROM as splash screen.
 NEW | SplashDelay | 0x41 | Save and save splash screen display time, ~0.1s units.
 ALL | DisplayOnTimed | 0x42 | Same as Adafruit DisplayOn command, but supports timeout value.
@@ -227,7 +227,7 @@ ALL | SaveCustomCharacter | 0xC1 | Create custom character #0-7 with 8 bytes of 
 ALL | GPIOStartState | 0xC3 | Sets the "initial" state of the GPIO pin, default "input pullup".
 CHG | SaveRGB | 0xD0 | Sets the backlight red, green, and blue levels (0-255) and saves to EEPROM. Same as Adafruit Set Backlight Color.
 ALL | SaveSize | 0xD1 | Set display size up to 20x4, saved to EEPROM. Only needed once.
-AF | Testbaud | 0xD2 | Test non standard baudrate. (Adafruit only, not supported).
+AF  | Testbaud | 0xD2 | Test non standard baudrate. (Adafruit only, not supported).
 NEW | SaveScrollMode | 0xD3 | Extended scroll modes, saved to EEPROM.
 NEW | ScaleRGB | 0xD4 | Scales the maximum LED intensities red, green, and blue levels (0-255, Adafruit: 100, 190, 255).
 NEW | SetRGB | 0xD5 | Sets the backlight red, green, and blue levels (0-255), not saved to EEPROM.
