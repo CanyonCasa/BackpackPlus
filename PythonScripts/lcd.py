@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 
 '''
 Python command script for Adafruit USB+Serial LCD backpack
