@@ -316,7 +316,7 @@ def commandLCD(commandList):
   if not quiet:
     print(str(list(map(chHex, data))))
   for c in data:
-    lcd.write(chr(c))
+    lcd.write(c.to_bytes(1, byteorder='little'))
 
 # send serial data to
 def sendData(action, data):
