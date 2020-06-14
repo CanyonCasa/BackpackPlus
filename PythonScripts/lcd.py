@@ -267,26 +267,26 @@ scriptActions = {
 
 # help info...
 def help():
-  print "syntax: python lcd.py [-p <port>] [-v] -h | -i | -f <commandfile> | -c <command> <parameters> | text"
-  print "  where ..."
-  print "    -p <port>                  specifies the serial port for communications, default COM1"
-  print "    -v                         specifies verbose scripting"
-  print "    -h                         specifies this help"
-  print "    -i                         specifies interactive mode"
-  print "    -f <commandfile>           specifies a file containing commands"
-  print "    -c <command> <parameters>  specifies a human readable command interpretted and sent to LCD with any parameters"
-  print "    text                       specifies encoded text sent to the LCD"
-  print "  where commands include..."
+  print("syntax: python lcd.py [-p <port>] [-v] -h | -i | -f <commandfile> | -c <command> <parameters> | text")
+  print("  where ...")
+  print("    -p <port>                  specifies the serial port for communications, default COM1")
+  print("    -v                         specifies verbose scripting")
+  print("    -h                         specifies this help")
+  print("    -i                         specifies interactive mode")
+  print("    -f <commandfile>           specifies a file containing commands")
+  print("    -c <command> <parameters>  specifies a human readable command interpretted and sent to LCD with any parameters")
+  print("    text                       specifies encoded text sent to the LCD")
+  print("  where commands include...")
   for i in sorted(commands.keys()):
-    print "    %s" % commands[i]['format']
-    print "      %s" % commands[i]['desc']
+    print("    %s" % commands[i]['format'])
+    print("      %s" % commands[i]['desc'])
     if 'note' in commands[i]: 
-      print "      "+commands[i]['note']
-  print
-  print "  where special script actions include..."
+      print("      "+commands[i]['note'])
+  print()
+  print("  where special script actions include...")
   for i in sorted(scriptActions.keys()):
-    print "    %s" % scriptActions[i]['format']
-    print "      %s" % scriptActions[i]['desc']
+    print("    %s" % scriptActions[i]['format'])
+    print("      %s" % scriptActions[i]['desc'])
 
 # format bytes in 2 character hex strings...
 def chHex(c):
@@ -294,52 +294,52 @@ def chHex(c):
 
 # return ordinal value for integer or hex strings
 def x2ord(x):
-  if isinstance(x,basestring):
+  if isinstance(x, str):
     if x.startswith('0x'):
-      x = int(x,16)
+      x = int(x, 16)
     else:
       x = int(x)
   return x
 
 # decode a text string for writing to LCD
 def decodeText(text):
-  tmp = text.replace('\\b',chr(8))
-  tmp = text.replace('\\n',chr(10))
-  tmp = tmp.replace('\\r',chr(13))
+  tmp = text.replace('\\b', chr(8))
+  tmp = text.replace('\\n', chr(10))
+  tmp = tmp.replace('\\r', chr(13))
   for c in '01234567': 
-    tmp=tmp.replace('\\'+c,chr(int(c)))
+    tmp=tmp.replace('\\'+c, chr(int(c)))
   return tmp
 
 # convert a command list to bytes as needed and send to LCD
 def commandLCD(commandList):
-  data = map(x2ord,commandList)
+  data = list(map(x2ord, commandList))
   if not quiet:
-    print str(map(chHex,data))
+    print(str(list(map(chHex, data))))
   for c in data:
     lcd.write(chr(c))
 
 # send serial data to 
-def sendData(action,data):
+def sendData(action, data):
   global verbose, quiet
   if action in commands:
       # process command
     if verbose: # a little debug info...
-      print "command..." 
-      print "  %s" % commands[action]['format']
+      print("command...") 
+      print("  %s" % commands[action]['format'])
   elif action in scriptActions: 
     # script actions
     if verbose: # a little debug info...
-      print "script action..." 
-      print "  format: %s" % scriptActions[action]['format']
+      print("script action...") 
+      print("  format: %s" % scriptActions[action]['format'])
     if action=='sleep':
       if verbose:
-        print "    SLEEPING %s[seconds]" % data
+        print("    SLEEPING %s[seconds]" % data)
       sleep(data)
       data = []
     elif action=='text':
       if verbose:
-        print "    TEXT:", data
-      data = map(ord,decodeText(data))
+        print("    TEXT:", data)
+      data = list(map(ord, decodeText(data)))
     elif action=='transcripting':
       verbose = (data=='VERBOSE')
       quiet = (data=='QUIET')
@@ -347,15 +347,15 @@ def sendData(action,data):
       data = []
     elif action=='raw':
       if verbose:
-        print "    Raw command:", data[1:]
+        print("    Raw command:", data[1:])
   elif action == '-???-':
-    print "UNKNOWN COMMAND: try \"help\" for more info"
+    print("UNKNOWN COMMAND: try \"help\" for more info")
     return
   else: 
     # assume text
     if verbose: # a little debug info...
-      print "text..." 
-      print "  \"%s\"" % action
+      print("text...") 
+      print("  \"%s\"" % action)
   if len(data):
     commandLCD(data)
 
@@ -372,15 +372,15 @@ def interpretCmd(tokens):
       if commands[cmd]['code']==0xDF:
         size = len(tokens)
       else:
-        print 'WARNING: Incorrect number of paramaters given [%i] for command[%i]: %s' % (len(tokens),size,commands[cmd]['format'])
-    for i in range(0,size):
+        print('WARNING: Incorrect number of paramaters given [%i] for command[%i]: %s' % (len(tokens), size, commands[cmd]['format']))
+    for i in range(0, size):
       tmp = tokens.pop(0)
-      if commands[cmd]['code'] in [0x34,0x40]:
+      if commands[cmd]['code'] in [0x34, 0x40]:
         if tmp.length:
-          lcdData += map(ord,decodeText(tmp)) # special case: break string into ordinal list add to array
+          lcdData += list(map(ord, decodeText(tmp))) # special case: break string into ordinal list add to array
       else:
         if tmp.startswith("0x"):
-          tmp = int(tmp[2:],16)
+          tmp = int(tmp[2:], 16)
         elif tmp==str(int(tmp)):
           tmp = int(tmp)
         lcdData.append(tmp)
@@ -395,14 +395,14 @@ def interpretCmd(tokens):
       lcdData = [0xFE] + tokens
   else:
     if len(tokens)==0:
-      return interpretCmd(['text',rawtext]) # assume bare text
+      return interpretCmd(['text', rawtext]) # assume bare text
     else:
       cmd = '-???-' # UNKNOWN COMMAND
-  return [cmd,lcdData]
+  return [cmd, lcdData]
 
 # split lines by whitespace and commas, but preserve quoted strings
 def linesplit(line):
-  ss = shlex.shlex(line,posix=True)
+  ss = shlex.shlex(line, posix=True)
   ss.whitespace += ','
   ss.whitespace_split = True
   sx = list(ss)
@@ -411,14 +411,14 @@ def linesplit(line):
 def sendLine(line, wait):
   if line:
     if line.startswith('matrixwritecommand'):
-      [cmd, data] = interpretCmd(['raw'] + line[line.index('[')+1:line.index(']')].replace(',',' ').split())
+      [cmd, data] = interpretCmd(['raw'] + line[line.index('[')+1:line.index(']')].replace(',', ' ').split())
     else:
-      [cmd,data] = interpretCmd(linesplit(line))
+      [cmd, data] = interpretCmd(linesplit(line))
     sendData(cmd, data)
-  for w in range(0,(1000*wait)+1):
+  for w in range(0, (1000*wait)+1):
     sleep(0.001)
     if lcd.in_waiting:
-      print "  > "+lcd.readline().strip()
+      print("  > "+lcd.readline().strip())
 
 # get arguments, remove script name
 args = sys.argv[1:]
@@ -439,56 +439,56 @@ while (args):
   elif x=='-f' and len(args):
     file = args.pop(0)
   elif x=='-c' and len(args):
-    [cmd,lcdData] = interpretCmd(args)
+    [cmd, lcdData] = interpretCmd(args)
   else:
     text = x
-    lcdData = map(ord,x)
+    lcdData = list(map(ord, x))
 
 # define serial connection to LCD...
 if verbose:
-  print "port: " + port
-  print "  flushing serial data..."
+  print("port: " + port)
+  print("  flushing serial data...")
 lcd = serial.Serial(port, 9600, timeout=1)
 # clear queue
-sendLine('',1)
+sendLine('', 1)
 
 
 # commandline actions...
 # write command request to LCD...
 if cmd:
-  sendData(cmd,lcdData);
+  sendData(cmd, lcdData);
 # just write text to LCD...
 if text:
-  sendData(text,lcdData);
+  sendData(text, lcdData);
 # read commands from a file
 if file:
   if verbose:
-    print "command file: ", file, "..."  # a little debug info...
-  commandlines = open(file,"r").readlines()
+    print("command file: ", file, "...")  # a little debug info...
+  commandlines = open(file, "r").readlines()
   n = 0
   for line in commandlines:
     n += 1
-    line = re.sub(r'#.*','',line).strip() # exclude comments
+    line = re.sub(r'#.*', '', line).strip() # exclude comments
     if not line: continue                 # skip empty lines
     if line.lower()=='quit':
-      print "Quiting commandfile at line %i of %i lines..." % (n,len(commandlines))
+      print("Quiting commandfile at line %i of %i lines..." % (n, len(commandlines)))
       break
-    if sendLine(line,0):
+    if sendLine(line, 0):
       break
 
 # interactive mode
 while (interactive):
   # readline from prompted stdin...
-  line = raw_input("CMD>").strip()
+  line = input("CMD>").strip()
   if line.lower()=='help':
     help()
   elif line.lower()=='quit':
     interactive = False
-    print "Quiting interactive mode..."
+    print("Quiting interactive mode...")
     break
   else:
-    sendLine(line,1)
+    sendLine(line, 1)
 
 # final check for data...
-sendLine("",1)
+sendLine("", 1)
 lcd.close()
