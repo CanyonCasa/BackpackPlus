@@ -244,7 +244,7 @@ commands = {
 # script actions
 scriptActions = {
   'sleep': {
-    'desc':               'Temporarily pause commandfile processing',
+    'desc':               'Temporarily pause command file processing',
     'format':             'Sleep <seconds>'
     },
   'text': {
@@ -260,21 +260,21 @@ scriptActions = {
     'format':             'Transcripting Quiet|Normal|Verbose'
     },
   'quit': {
-    'desc':               'End commandfile or interactive processing',
+    'desc':               'End command file or interactive processing',
     'format':             'Quit'
     }
   }
 
 # help info...
 def help():
-  print("syntax: python lcd.py [-p <port>] [-v] -h | -i | -f <commandfile> | -c <command> <parameters> | text")
+  print("syntax: python3 lcd.py [-p <port>] [-v] -h | -i | -f <command file> | -c <command> <parameters> | text")
   print("  where ...")
   print("    -p <port>                  specifies the serial port for communications, default COM1")
   print("    -v                         specifies verbose scripting")
   print("    -h                         specifies this help")
   print("    -i                         specifies interactive mode")
-  print("    -f <commandfile>           specifies a file containing commands")
-  print("    -c <command> <parameters>  specifies a human readable command interpretted and sent to LCD with any parameters")
+  print("    -f <command file>          specifies a file containing commands")
+  print("    -c <command> <parameters>  specifies a human readable command interpreted and sent to LCD with any parameters")
   print("    text                       specifies encoded text sent to the LCD")
   print("  where commands include...")
   for i in sorted(commands.keys()):
@@ -372,7 +372,7 @@ def interpretCmd(tokens):
       if commands[cmd]['code']==0xDF:
         size = len(tokens)
       else:
-        print('WARNING: Incorrect number of paramaters given [%i] for command[%i]: %s' % (len(tokens), size, commands[cmd]['format']))
+        print('WARNING: Incorrect number of parameters given [%i] for command [%i]: %s' % (len(tokens), size, commands[cmd]['format']))
     for i in range(0, size):
       tmp = tokens.pop(0)
       if commands[cmd]['code'] in [0x34, 0x40]:
@@ -471,7 +471,7 @@ if file:
     line = re.sub(r'#.*', '', line).strip() # exclude comments
     if not line: continue                 # skip empty lines
     if line.lower()=='quit':
-      print("Quiting commandfile at line %i of %i lines..." % (n, len(commandlines)))
+      print("Quitting command file at line %i of %i lines..." % (n, len(commandlines)))
       break
     if sendLine(line, 0):
       break
@@ -484,7 +484,7 @@ while (interactive):
     help()
   elif line.lower()=='quit':
     interactive = False
-    print("Quiting interactive mode...")
+    print("Quitting interactive mode...")
     break
   else:
     sendLine(line, 1)
